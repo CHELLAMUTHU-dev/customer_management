@@ -12,12 +12,21 @@ const getAllCustomers = (req, res)=> {
 
 const createNewCustomer = (req,res) => {
     const {first_name, last_name,  phone} = req.body;
-    const sql = 'INSERT INTO customers (first_name, last_name, phone) VALUES (?, ?, ?)';
-    dbConnection.query(sql, [first_name, last_name, phone], (err, results) => {
+    const oldDataSql = "SELECT * FROM customers WHERE first_name = ? AND phone = ? AND last_name = ?";
+    dbConnection.query(oldDataSql, [first_name, phone, last_name], (err, results) => {
         if (err) {
-            return res.status(500).json({ error: 'Database insert error', details: err });
+            return res.status(500).json({ error: 'Database query error', details: err });
         }
-        res.status(201).json({ message: 'Customer created', customerId: results.insertId });
+        if (results.length > 0) {
+            return res.status(400).json({ message: 'Customer already exists' });
+        }
+        const sql = 'INSERT INTO customers (first_name, last_name, phone) VALUES (?, ?, ?)';
+        dbConnection.query(sql, [first_name, last_name, phone], (err, results) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database insert error', details: err });
+            }
+            res.status(201).json({ message: 'Customer created', customerId: results.insertId });
+        });
     });
 }
 
@@ -29,7 +38,7 @@ const getCustomerById = (req,res) => {
             return res.status(500).json({ error: 'Database query error', details: err });
         }
         if (results.length === 0) {
-            return res.status(404).json({ error: 'Customer not found' });
+            return res.status(404).json({ message: 'Customer not found' });
         }
         res.json(results[0]);
     });
@@ -44,7 +53,7 @@ const updateCustomerById = (req,res) => {
             return res.status(500).json({ error: 'Database query error', details: err });
         }
         if (results.length === 0) {
-            return res.status(404).json({ error: 'Customer not found' });
+            return res.status(404).json({ message: 'Customer not found' });
         }
         const existingCustomer = results[0];
         const updatedCustomer = {
@@ -63,7 +72,7 @@ const performUpdate = (customerId, {first_name, last_name, phone}, res) => {
             return res.status(500).json({ error: 'Database update error', details: err });
         }
         if (results.affectedRows === 0) {
-            return res.status(404).json({ error: 'Customer not found' });
+            return res.status(404).json({ message: 'Customer not found' });
         }
         res.json({ message: 'Customer updated', customerId });
     });
@@ -77,16 +86,29 @@ const deleteCustomerById = (req,res) => {
             return res.status(500).json({ error: 'Database delete error', details: err });
         }
         if (results.affectedRows === 0) {
-            return res.status(404).json({ error: 'Customer not found' });
+            return res.status(404).json({ message: 'Customer not found' });
         }
         res.json({ message: 'Customer deleted', customerId });
     }
 );
 }   
 
+const getAllCustomersWithAddresses = (req, res) => {
+    const sql = `
+        SELECT c.customer_id, c.first_name, c.last_name, c.phone, a.address_details,  a.city, a.pin_code, a.state , a.address_id
+FROM customers AS c
+        LEFT JOIN address AS a ON c.customer_id = a.customer_id
+    `;
+    dbConnection.query(sql, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database query error', details: err });
+        }
+        res.json(results);
+    });
+}
 
 
 
 module.exports = {
-    getAllCustomers, createNewCustomer, getCustomerById, updateCustomerById, deleteCustomerById
+    getAllCustomers, createNewCustomer, getCustomerById, updateCustomerById, deleteCustomerById, getAllCustomersWithAddresses
 };

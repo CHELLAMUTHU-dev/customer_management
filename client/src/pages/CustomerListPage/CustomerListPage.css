@@ -1,0 +1,33 @@
+.customer-list-page-container{
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+
+}
+.customer-list-page-title{
+    text-align: center;
+    margin-bottom: 20px;
+}
+.customer-list-page-table{
+     width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin: 10px auto;
+}
+.customer-list-page-table th, .customer-list-page-table td{
+    border: 1px solid #ddd;
+    padding: 30px 15px;
+    text-align: center;
+    font-size: 16px;
+}
+.customer-list-page-table th{
+    background-color: #f2f2f2;
+}
+.customer-list-page-table tr:nth-child(even){
+    background-color: #f9f9f9;
+}
+.customer-list-page-table tr:hover{
+    background-color: #ddd;
+}

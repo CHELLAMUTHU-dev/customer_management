@@ -5,8 +5,8 @@ const {  createNewAddress, getAddressById, updateAddressById, deleteAddressById 
 
 
 router.post('/:id/addresses', createNewAddress);
-router.get('/:id/addresses', getAddressById);
-router.put('/:addressId', updateAddressById);
+router.get('/:id/address', getAddressById);
+router.put('/address/:addressId', updateAddressById);
 router.delete('/:addressId', deleteAddressById);
 
 module.exports = router;
