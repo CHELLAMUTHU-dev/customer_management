@@ -8,7 +8,7 @@ export const CustomerManagementContext = createContext(null);
 const CustomerManagementProvider = ({ children }) => {
   const [customers, setCustomers] = useState([]);
   const [addresses, setAddresses] = useState([]);
-  const url = "http://localhost:7002/api";
+  const url = "https://customer-management-odl4.onrender.com/api";
 
   const convertToCamelCase = (data) => ({
     customerId: data.customer_id,
