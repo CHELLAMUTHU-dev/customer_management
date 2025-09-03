@@ -6,7 +6,9 @@ import Popup from "reactjs-popup";
 import "./CustomerDetailsPage.css";
 
 const CustomerDetailsPage = () => {
-  const { url, updateAddress } = useContext(CustomerManagementContext);
+  const { url, updateAddress, addAddress } = useContext(
+    CustomerManagementContext
+  );
   const { customerId } = useParams();
   const [customer, setCustomer] = useState(null);
   const [address, setAddress] = useState(null);
@@ -59,7 +61,13 @@ const CustomerDetailsPage = () => {
 
   const onClickUpdateAddress = async (addressId) => {
     try {
-      await updateAddress(addressId, userAddress);
+      if (address) {
+        // update existing
+        await updateAddress(address.address_id, userAddress);
+      } else {
+        // add new
+        await addAddress(customerId, userAddress);
+      }
       setUserAddress({
         city: "",
         state: "",
@@ -79,7 +87,7 @@ const CustomerDetailsPage = () => {
       await fetchCustomerDetails();
       await fetchAddressDetails();
     };
-    
+
     fetchData();
   }, [customerId]);
 
@@ -87,12 +95,10 @@ const CustomerDetailsPage = () => {
     return <div className="loading">Loading customer details...</div>;
   }
 
-  
-
   return (
     <div className="customer-details-container">
       <h1 className="customer-details-heading">Customer Details</h1>
-      
+
       <div className="customer-info">
         <h2>Personal Information</h2>
         <div className="info-grid">
@@ -113,20 +119,30 @@ const CustomerDetailsPage = () => {
 
       <div className="address-section">
         <h2>Address Information</h2>
-        
+
         {address ? (
           <div className="address-details">
-            <p><strong>Address:</strong> {address.address_details}</p>
-            <p><strong>City:</strong> {address.city}</p>
-            <p><strong>State:</strong> {address.state}</p>
-            <p><strong>PIN Code:</strong> {address.pin_code}</p>
+            <p>
+              <strong>Address:</strong> {address.address_details}
+            </p>
+            <p>
+              <strong>City:</strong> {address.city}
+            </p>
+            <p>
+              <strong>State:</strong> {address.state}
+            </p>
+            <p>
+              <strong>PIN Code:</strong> {address.pin_code}
+            </p>
           </div>
         ) : (
           <p>No address found for this customer.</p>
         )}
-        
+
         <Popup
-          trigger={<button className="update-address-button">Update Address</button>}
+          trigger={
+            <button className="update-address-button">{address ? "Update Address" : "Add Address"}</button>
+          }
           modal
           nested
           onOpen={() => {
@@ -181,7 +197,7 @@ const CustomerDetailsPage = () => {
                     required
                   />
                 </div>
-                
+
                 <div className="input-group">
                   <label htmlFor="state">State:</label>
                   <input
@@ -194,7 +210,7 @@ const CustomerDetailsPage = () => {
                     required
                   />
                 </div>
-                
+
                 <div className="input-group">
                   <label htmlFor="pinCode">PIN Code:</label>
                   <input
@@ -210,9 +226,13 @@ const CustomerDetailsPage = () => {
                     required
                   />
                 </div>
-                
+
                 <div className="actions">
-                  <button type="button" onClick={close} className="cancel-button">
+                  <button
+                    type="button"
+                    onClick={close}
+                    className="cancel-button"
+                  >
                     Cancel
                   </button>
                   <button type="submit" className="confirm-button">

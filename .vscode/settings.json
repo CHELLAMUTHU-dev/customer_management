@@ -13,5 +13,6 @@
             "database": "customer_management",
             "username": "root"
         }
-    ]
+    ],
+    "postman.settings.dotenv-detection-notification-visibility": false
 }
